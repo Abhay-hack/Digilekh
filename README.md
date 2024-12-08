@@ -24,3 +24,23 @@ To set up the backend, you need to install the following dependencies:
 1. Navigate to the `backend` directory:
    ```sh
    cd backend
+2. Install Dependencies
+  ```sh
+  npm i
+  npm multer
+
+
+### 2. Frontend
+To set up the backend, you need to install the following dependencies:
+
+- **Languages and Frameworks:**
+  - React.js
+
+#### Steps to Install Backend Dependencies:
+1. Navigate to the `frontend` directory:
+   ```sh
+   cd frontend
+2. Install Dependencies
+  ```sh
+  npm i
+  
