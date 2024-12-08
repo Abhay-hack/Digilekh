@@ -25,9 +25,9 @@ To set up the backend, you need to install the following dependencies:
    ```sh
    cd backend
 2. Install Dependencies
-  ```sh
-  npm i
-  npm multer
+   ```sh
+   npm i
+   npm multer
 
 
 ### 2. Frontend
@@ -41,6 +41,6 @@ To set up the backend, you need to install the following dependencies:
    ```sh
    cd frontend
 2. Install Dependencies
-  ```sh
-  npm i
+   ```sh
+   npm i
   
