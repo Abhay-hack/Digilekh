@@ -1,11 +1,18 @@
-# Digilekh
+#✨ Digilekh
 
-## Overview
-Digilekh is a web application designed to manage [describe your project's purpose briefly].
+**Digilekh** is a web application designed to manage .
+
+
+## 🔍 Project Overview
+
+
+## 🚀 Features
 
 ---
 
-## Dependencies
+## 🚧 Getting Started
+
+To set up this project locally, follow these instructions:
 
 ### 1. Backend
 To set up the backend, you need to install the following dependencies:
@@ -40,7 +47,7 @@ To set up the backend, you need to install the following dependencies:
    MONGO_URI=your-mongo-uri
    JWT_SECRET=your-jwt-secret
 
-## Backend Folder Structure:
+## 🗂️ Backend Folder Structure:
    ```sh
    project/
    ├── middleware/
@@ -61,11 +68,20 @@ To set up the backend, you need to install the following dependencies:
    ├── .env                   // Environment variables
    └── package.json
 
+```
+# How to run
+  ```sh
+  node index.js
+```
+  or
+  ```sh
+  nodemon index.js
+```
 
 ### 2. Frontend
 To set up the backend, you need to install the following dependencies:
 
-- **Languages and Frameworks:**
+  - **Languages and Frameworks:**
   - React.js
 
 #### Steps to Install Backend Dependencies:
@@ -75,4 +91,45 @@ To set up the backend, you need to install the following dependencies:
 2. Install Dependencies
    ```sh
    npm i
+   npm install react-router-dom axios socket.io-client styled-components moment
+
+# How to run
+```sh
+npm run dev
+
+```
+
+## 🗂️ Frontend Folder Structure
+  ```sh
+src/
+├── components/
+│   ├── Header.js
+│   ├── Loader.js
+│   ├── CommentSection.js
+│   └── BlogPost.js
+├── pages/
+│   ├── Home.js
+│   ├── About.js
+│   ├── Contact.js
+│   ├── Signup.js
+│   ├── Login.js
+│   ├── Profile.js
+│   ├── Blogs.js
+│   ├── BlogDetail.js
+│   ├── CommunityList.js
+│   ├── CommunityDetail.js
+│   └── CommunityCreate.js
+├── assets/
+│   └── user.png
+├── axios/
+│   ├── index.js           # Configure axios instances here
+├── App.js
+└── index.js
+
+```
   
+## 🎯 How to Use
+
+
+## 👤 Author
+This project was created by **Abhay Gupta**. Feel free to connect on [LinkedIn](https://www.linkedin.com/in/abhay-gupta-1257b6248/) or check out more projects on [GitHub](https://github.com/Abhay-hack/Lumina).
