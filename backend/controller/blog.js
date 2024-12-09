@@ -1,8 +1,21 @@
 const Blog = require('../models/blog');
 const Comment = require('../models/comment');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+require('dotenv').config();
 
-async function handleBlogPost(req, res) {
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploads/');  // Store files in 'uploads' folder
+    },
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + path.extname(file.originalname));  // Add timestamp to file name
+    }
+  });
+
+
+  async function handleBlogPost(req, res) {
     try {
         const token = req.cookies.authToken;
         if (!token) {
@@ -15,15 +28,22 @@ async function handleBlogPost(req, res) {
         const { title, content, published } = req.body;
         console.log(req.body);
 
-        if (!title || !content || !published) {
-            return res.status(400).json({ error: 'All fields are required' });
+        if (!title || !content) {
+            return res.status(400).json({ error: 'Title and content are required' });
+        }
+
+        // If file is uploaded, handle it
+        let imageUrl = null;
+        if (req.file) {
+            imageUrl = `/uploads/${req.file.filename}`;  // Save image URL (path)
         }
 
         const blog = await Blog.create({
             title,
             content,
-            author:userId,
-            published,
+            author: userId,
+            published: published !== undefined ? published : true,
+            image: imageUrl,
         });
 
         return res.status(201).json({ message: 'Blog created successfully', blog });
@@ -33,50 +53,94 @@ async function handleBlogPost(req, res) {
     }
 }
 
-async function handleCommentPost(req, res) {
+async function handleFetchComments(req, res) {
     try {
-        const token = req.cookies.authToken;
-        if (!token) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
+        const { blogId } = req.params;
 
-        const decoded = jwt.verify(token, 'Abhay');
-        const userId = decoded.userId;
+        // Fetch the blog and populate comments with author details
+        const blog = await Blog.findById(blogId)
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'author', // Populate the author field
+                    select: 'fullname' // Only select the 'fullname' field from the User model
+                }
+            });
 
-        const { content ,blogId} = req.body;
-        console.log(req.body);
-
-        if (!content || !blogId) {
-            return res.status(400).json({ error: 'Content is required' });
-        }
-
-        const blog = await Blog.findById(blogId);
         if (!blog) {
             return res.status(404).json({ error: 'Blog not found' });
         }
 
-        const comment = await Comment.create({
-            content,
-            author: userId,
+        res.status(200).json({ comments: blog.comments });
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+        res.status(500).json({ error: 'Error fetching comments. Please try again later.' });
+    }
+}
+
+
+async function handleCommentPost(req, res) {
+    try {
+        // Get the token from cookies
+        const token = req.cookies.authToken;
+        if (!token) {
+            return res.status(401).json({ error: 'Authentication token is missing.' });
+        }
+
+        // Decode the token to get the userId
+        const decoded = jwt.verify(token, "Abhay"); // Use environment variable for security
+        const userId = decoded.userId;
+
+        // Extract content and blogId from request
+        const { blogId } = req.params;
+        const { content } = req.body;
+
+        // Validate content
+        if (!content || content.trim() === '') {
+            return res.status(400).json({ error: 'Comment content cannot be empty.' });
+        }
+
+        // Find the blog post by ID
+        const blog = await Blog.findById(blogId);
+        if (!blog) {
+            return res.status(404).json({ error: 'Blog not found.' });
+        }
+
+        // Create a new comment object
+        const comment = new Comment({
+            content: content.trim(),
+            author: userId, // Reference the user who made the comment
             blogPost: blogId,
         });
 
-        const commentId = comment._id;
-        console.log("Comment Id:" + commentId);
+        // Save the comment to the database
+        await comment.save();
 
-        blog.comments.push(commentId);
+        // Add the comment to the blog's comments array
+        blog.comments.push(comment._id);
         await blog.save();
-        
-        return res.status(201).json({ message: 'Comment Posted successfully', comment });
+
+        // Populate the author's full name for the response
+        await comment.populate('author', 'fullname');
+
+        // Return the comment data in the response
+        return res.status(201).json({
+            message: 'Comment posted successfully.',
+            comment: {
+                ...comment.toObject(),
+                author: comment.author.fullname,
+                createdAt: comment.createdAt,
+            },
+        });
     } catch (error) {
-        console.error('Error:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Error in handleCommentPost:', error);
+        return res.status(500).json({ error: 'Internal Server Error. Please try again later.' });
     }
 }
 
 async function handleBlog(req,res){    
     try {
-    const blogs = await Blog.find();
+    const blogs = await Blog.find().populate('author', 'fullname');
     return res.status(200).json({ blogs });
 } catch (error) {
     console.error("Error fetching blogs:", error);
@@ -147,7 +211,7 @@ async function handleDeleteBlog(req, res) {
 async function handleIndividualBlog(req,res){
     try {
         const { id } = req.params;
-        const blog = await Blog.findById(id).populate('author', 'name email');
+        const blog = await Blog.findById(id).populate('author', 'fullname');
 
         if (!blog) {
             return res.status(404).json({ error: 'Blog not found' });
@@ -193,23 +257,32 @@ async function handleUpdateBlog(req, res) {
 
 async function handleUpdateComment(req, res) {
     try {
-        const { id } = req.params; 
+        const { blogId, commentId } = req.params;  // Get both blogId and commentId from the URL
         const { text } = req.body;
 
-        if (!id || !text) {
-            return res.status(400).json({ message: "Invalid input data." });
+        if (!text) {
+            return res.status(400).json({ message: "Text is required to update the comment." });
         }
 
-        const updatedComment = await Comment.findByIdAndUpdate(
-            id,
-            { text },
-            { new: true }
-        );
-
-        if (!updatedComment) {
+        // Find the comment by its ID
+        const comment = await Comment.findById(commentId);
+        if (!comment) {
             return res.status(404).json({ message: "Comment not found." });
         }
 
+        // Check if the user is authorized to edit the comment
+        if (comment.author.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "You are not authorized to edit this comment." });
+        }
+
+        // Update the comment's text
+        comment.text = text;
+        const updatedComment = await comment.save();
+
+        // Optionally, you could populate the comment with the author's details (e.g., fullname)
+        await updatedComment.populate('author', 'fullname').execPopulate();
+
+        // Return the updated comment
         res.status(200).json({ message: "Comment updated successfully.", comment: updatedComment });
     } catch (error) {
         res.status(500).json({ message: "Error updating the comment.", error: error.message });
@@ -226,4 +299,5 @@ module.exports = {
     handleIndividualBlog,
     handleUpdateBlog,
     handleUpdateComment,
+    handleFetchComments,
 }

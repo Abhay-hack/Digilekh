@@ -17,6 +17,7 @@ const Header = () => {
           {/* If the user is logged in, show "Write Post" and "Profile" */}
           {token ? (
             <>
+              <Link to="/community" className="text-white hover:text-blue-400">Join Community</Link> {/* Fixed link */}
               <Link to="/api/blog/create" className="text-white hover:text-blue-400">
                 Write Post
               </Link>

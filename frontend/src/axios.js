@@ -17,4 +17,10 @@ const userInstance = axios.create({
   withCredentials: true,
 });
 
-export { apiInstance, userInstance };
+const communityInstance = axios.create({
+  baseURL: 'http://localhost:5000/community',
+  withCredentials: true,
+});
+
+export { apiInstance, userInstance , communityInstance };
+  

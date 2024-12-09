@@ -46,7 +46,7 @@ const Blogs = () => {
             <div className="text-center col-span-full">No blogs available</div>
           ) : (
             blogs.map((blog) => (
-              <Link to={`/blog/${blog.id}`} key={blog.id}>
+              <Link to={`/api/blog/${blog._id}`} key={blog.id}>
                 <BlogCard blog={blog} />
               </Link>
             ))

@@ -2,6 +2,7 @@ const User = require('../models/user');
 const { createHmac } = require('crypto');
 const jwt = require('jsonwebtoken');
 const Blog = require('../models/blog');
+const Community = require('../models/Community')
 
 const cookie  = require('cookie-parser')
 
@@ -31,8 +32,6 @@ async function handleUserSignup(req, res) {
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
-
-
 
 
 async function handleUserLogin(req, res) {
@@ -85,11 +84,15 @@ async function handleProfile(req, res){
             return res.status(404).json({ error: 'User not found' });
         }
 
+        const communities = await Community.find({ creator: userId })
+            .populate('creator', 'fullname email');
+
         const blogs = await Blog.find({ author: userId }); 
 
         return res.status(200).json({
             user,
-            blogs
+            blogs,
+            communities,
         });
     } catch (error) {
         console.error('Error fetching user data:', error);

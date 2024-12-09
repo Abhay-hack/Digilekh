@@ -9,6 +9,9 @@ import Profile from './pages/Profile';
 import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
 import BlogPost from './components/BogPost';
+import CommunityList from './pages/CommunityList';
+import CommunityDetail from './pages/CommunityDetail';
+import CommunityCreate from './pages/CommunityCreate';
 
 const App = () => {
   return (
@@ -23,6 +26,9 @@ const App = () => {
         <Route path="/api/blog" element={<Blogs />} />
         <Route path="/api/blog/create" element={<BlogPost />} />
         <Route path="/api/blog/:id" element={<BlogDetail />} />
+        <Route path="/community" element={<CommunityList />} />
+        <Route path="/community/create" element={<CommunityCreate />} />
+        <Route path="/community/:communityId" element={<CommunityDetail />} />
       </Routes>
     </Router>
   );
