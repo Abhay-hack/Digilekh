@@ -30,9 +30,9 @@ To set up the backend, you need to install the following dependencies:
    npm multer
 3. Create a `.env` file
    ```sh
-   PORT
-   MONGO_URI=
-   JWT_SECRET =
+   PORT=your-port-number
+   MONGO_URI=your-mongo-uri
+   JWT_SECRET=your-jwt-secret
 
 
 ### 2. Frontend
