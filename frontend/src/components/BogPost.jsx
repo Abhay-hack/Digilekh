@@ -1,29 +1,24 @@
-import React, { useState } from "react";  
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiInstance } from '../axios';
+import { apiInstance } from "../axios";
 import Header from "../components/Header";
 
 const BlogPost = () => {
   const navigate = useNavigate();
-  
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [imageFile, setImageFile] = useState(null); // State to store the image file
+  const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Handle file change for the image
   const handleImageChange = (e) => {
-    const file = e.target.files[0]; // Get the selected file
-    if (file) {
-      setImageFile(file); // Set the image file in state
-    }
+    const file = e.target.files[0];
+    if (file) setImageFile(file);
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     setLoading(true);
     setError("");
 
@@ -36,86 +31,97 @@ const BlogPost = () => {
         return;
       }
 
-      // Create FormData to send data and file
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
       if (imageFile) {
-        formData.append("image", imageFile); // Append image file to form data
+        formData.append("image", imageFile);
       }
 
-      // POST request to create a new blog post (using the correct route '/blog/create')
-      const response = await apiInstance.post(
-        "/blog/create",  // Correct route for creating blogs
-        formData,
-        {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "multipart/form-data", // Ensure the request is sent as form data
-          },
-        }
-      );
+      await apiInstance.post("/blog/create", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-      // Navigate to the list of blogs or a specific blog page after success
-      navigate("/api/blog");  // Adjust based on where you want to redirect
-
+      navigate("/api/blog");
     } catch (error) {
       setError("Failed to post the blog. Please try again later.");
-      console.error("Error posting blog:", error.response ? error.response.data : error.message);
+      console.error("Error posting blog:", error.response?.data || error.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="blog-post-form p-4">
+    <div className="bg-gray-50 min-h-screen">
       <Header />
-      <h2 className="text-2xl font-semibold mb-4">Create a New Blog</h2>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="title" className="block text-gray-700">Title</label>
-          <input 
-            type="text" 
-            id="title" 
-            className="w-full px-4 py-2 border rounded-md" 
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
+      <div className="mt-8 max-w-3xl mx-auto bg-white shadow-md rounded-lg p-8">
+        <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+          Create a New Blog
+        </h2>
+        {error && (
+          <div className="text-red-500 mb-4 p-2 bg-red-50 border border-red-200 rounded">
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Title Input */}
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+              Blog Title
+            </label>
+            <input
+              type="text"
+              id="title"
+              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </div>
 
-        <div className="mb-4">
-          <label htmlFor="content" className="block text-gray-700">Content</label>
-          <textarea
-            id="content"
-            className="w-full px-4 py-2 border rounded-md"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-          />
-        </div>
+          {/* Content Input */}
+          <div>
+            <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+              Blog Content
+            </label>
+            <textarea
+              id="content"
+              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 resize-none"
+              rows={8}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              required
+            />
+          </div>
 
-        <div className="mb-4">
-          <label htmlFor="image" className="block text-gray-700">Upload Image(Optional)</label>
-          <input
-            type="file"
-            id="image"
-            className="w-full px-4 py-2 border rounded-md"
-            onChange={handleImageChange} // Handle image selection
-          />
-        </div>
+          {/* Image Upload */}
+          <div>
+            <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+              Upload Cover Image (Optional)
+            </label>
+            <input
+              type="file"
+              id="image"
+              className="mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+              onChange={handleImageChange}
+            />
+          </div>
 
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded-md"
-            disabled={loading}
-          >
-            {loading ? "Posting..." : "Post Blog"}
-          </button>
-        </div>
-      </form>
+          {/* Submit Button */}
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading}
+            >
+              {loading ? "Posting..." : "Post Blog"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

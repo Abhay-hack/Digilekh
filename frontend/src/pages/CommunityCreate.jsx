@@ -29,7 +29,7 @@ const CommunityCreate = () => {
       console.error('Error creating community:', err);
       setError('Failed to create community. Please try again.');
     } finally {
-      setLoading(false); // Hide loading indicator
+      setLoading(false);
     }
   };
 

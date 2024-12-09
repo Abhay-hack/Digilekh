@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { apiInstance } from '../axios';
-import CommentSection from '../components/CommentSection';
+import { apiInstance } from "../axios";
+import CommentSection from "../components/CommentSection";
 import Header from "../components/Header";
+import profilePlaceholder from "../assets/user.png";
 
 const BlogDetail = () => {
-  const { id } = useParams();  // Get the blog ID from the URL
+  const { id } = useParams();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,8 +14,8 @@ const BlogDetail = () => {
   useEffect(() => {
     const fetchBlogDetail = async () => {
       try {
-        const response = await apiInstance.get(`/blog/${id}`);  // Fetch the full blog using the ID
-        setBlog(response.data.blog);  
+        const response = await apiInstance.get(`/blog/${id}`);
+        setBlog(response.data.blog);
         setLoading(false);
       } catch (error) {
         setError("Error fetching blog details. Please try again later.");
@@ -27,29 +28,43 @@ const BlogDetail = () => {
   }, [id]);
 
   if (loading) {
-    return <div>Loading blog...</div>;
+    return <div className="flex justify-center items-center h-screen text-gray-500">Loading blog...</div>;
   }
 
   if (error) {
-    return <div className="text-center text-red-500 py-4">{error}</div>;
+    return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
   }
 
   return (
-    <div className="blog-detail p-4">
-      <Header/>
-      <h2 className="text-3xl font-semibold mb-4">{blog.title}</h2>
-      <img 
-        src={`http://localhost:5000${blog.image || "/uploads/default-image.jpg"}`} 
-        alt={blog.title}
-        className="w-full h-64 object-cover mb-4"
-      />
-      <p className="text-gray-600">{blog.content}</p>
-      <p className="text-gray-500 text-sm mt-4">
-        Posted by {blog.author ? blog.author.fullname : "Anonymous"} {/* Display the author's name */}
-      </p>
+    <div>
+      <Header />
+      <div className="container mx-auto px-4 lg:px-8 py-8">
+        <article className="max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold leading-tight text-gray-900 mb-6">{blog.title}</h1>
+          <div className="flex items-center text-sm text-gray-600 mb-6">
+          <img
+            src={profilePlaceholder}
+            alt={blog.author?.fullname || "Author"}
+            className="w-8 h-8 rounded-full mr-3"
+          />
 
-      {/* Comment Section Component */}
-      <CommentSection blogId={id} /> {/* Pass the blogId to the CommentSection component */}
+            <span>
+              {blog.author ? blog.author.fullname : "Anonymous"} -{" "}
+              {new Date(blog.createdAt).toLocaleDateString()}
+            </span>
+          </div>
+          <img
+            src={`http://localhost:5000${blog.image || "/uploads/default-image.jpg"}`}
+            alt={blog.title}
+            className="w-full h-auto object-cover rounded-md shadow-lg mb-6"
+          />
+          <div className="prose lg:prose-xl text-gray-800 leading-relaxed">
+            {blog.content}
+          </div>
+        </article>
+        <hr className="my-8" />
+        <CommentSection blogId={id} />
+      </div>
     </div>
   );
 };

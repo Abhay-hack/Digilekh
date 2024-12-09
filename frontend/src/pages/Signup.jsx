@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { userInstance } from '../axios'; // Import the named export `userInstance`
+import { userInstance } from '../axios'; // Ensure this is properly configured
 import { Link } from 'react-router-dom';
 
 const Signup = () => {
@@ -10,9 +10,8 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await userInstance.post('/signup', { username, email, password }); 
+      const response = await userInstance.post('/signup', { username, email, password });
       console.log('Signup successful:', response.data);
-      
       window.location.href = '/api/blog';
     } catch (error) {
       console.error('Signup error:', error.response ? error.response.data : error.message);
@@ -20,50 +19,68 @@ const Signup = () => {
   };
 
   return (
-    <div>
-      <h2>Signup</h2>
-      <div className="max-w-md mx-auto mt-10 p-4 shadow-lg rounded-lg bg-white">
-        <h2 className="text-2xl font-bold mb-4">Signup</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Username"
-        className="w-full p-2 border border-gray-300 rounded"
-        required
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          className="w-full p-2 border border-gray-300 rounded"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          className="w-full p-2 border border-gray-300 rounded"
-          required
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-        >
-        Signup
-        </button>
-        <Link
-        to="/login"
-        className="block text-center text-blue-500 hover:underline"
-        >
-        Already have an account? Login
-        </Link>
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="p-16 rounded-xl shadow-lg bg-white w-1/3">
+        <h2 className="text-4xl font-bold text-center text-black mb-8">
+          Sign Up
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div>
+            <label className="block text-lg font-medium text-black">
+              Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
+              className="w-full px-4 py-3 border rounded-lg shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-black">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="w-full px-4 py-3 border rounded-lg shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-black">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="w-full px-4 py-3 border rounded-lg shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full py-3 text-lg font-bold bg-black text-white rounded-lg hover:bg-gray-800 transition-all"
+          >
+            Sign Up
+          </button>
         </form>
+        <div className="mt-8 text-center">
+          <Link
+            to="/login"
+            className="text-lg text-black hover:underline"
+          >
+            Already have an account? Login
+          </Link>
+        </div>
+      </div>
     </div>
-  </div>
   );
 };
 

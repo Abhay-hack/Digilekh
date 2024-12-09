@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { userInstance } from '../axios';  // Import the named export `userInstance`
+import { userInstance } from '../axios'; // Ensure this is properly configured
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -10,59 +10,58 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await userInstance.post('/login', { email, password });  // Fixed the endpoint here
+      const response = await userInstance.post('/login', { email, password });
       localStorage.setItem('authToken', response.data.token);
-      navigate('/api/blog');  // Redirect to the blog page after login
+      navigate('/api/blog');
     } catch (error) {
       console.error('Login error:', error.response ? error.response.data : error.message);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="p-16 rounded-xl shadow-lg bg-white w-1/3">
+        <h2 className="text-4xl font-extrabold text-center text-black mb-8">
+          Login
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-8">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-lg font-medium text-black">
+              Email
+            </label>
             <input
-              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full p-3 mt-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-4 py-3 border rounded-lg shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
               required
             />
           </div>
-
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-lg font-medium text-black">
+              Password
+            </label>
             <input
-              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full p-3 mt-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-4 py-3 border rounded-lg shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
               required
             />
           </div>
-
-          <div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Login
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="w-full py-3 text-lg font-bold bg-black text-white rounded-lg hover:bg-gray-800 transition-all"
+          >
+            Login
+          </button>
         </form>
-
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
+        <div className="mt-8 text-center">
+          <p className="text-lg text-black">
             Don't have an account?{' '}
-            <a href="/signup" className="text-blue-600 hover:underline">
+            <a href="/signup" className="font-bold underline">
               Sign Up
             </a>
           </p>

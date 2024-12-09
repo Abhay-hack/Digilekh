@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { communityInstance } from '../axios';
 import Header from "../components/Header";
+import Card from "../components/Card";
+import Loader from '../components/Loader';
 
 const CommunityList = () => {
   const [communities, setCommunities] = useState([]);
@@ -21,11 +23,12 @@ const CommunityList = () => {
         setLoading(false);
       }
     };
-
-    fetchCommunities();
+    setTimeout(() => {
+      fetchCommunities();
+    }, 1000); 
   }, []);
 
-  if (loading) return <div className="spinner">Loading...</div>;
+  if (loading) return<Loader />;;
   if (error) return <div className="text-red-500 bg-red-100 p-4 rounded-md">{error}</div>;
   if (communities.length === 0) {
     return (
@@ -42,31 +45,33 @@ const CommunityList = () => {
   }
 
   return (
-    <div className="community-list">
+    <div className="community-list px-6 lg:px-12">
       <Header />
-      <h2 className="text-2xl font-bold mb-4">Communities</h2>
+      <div className="mt-4"> {/* Adjusted margin-top */}
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Available Communities
+        </h2>
 
-      <ul>
-        {communities.map((community) => (
-          <li key={community._id} className="mb-4">
-            <h3
-              className="text-lg font-semibold cursor-pointer hover:text-blue-500"
-              onClick={() => navigate(`/community/${community._id}`)}
-            >
-              {community.name}
-            </h3>
-            <p className="text-gray-600">{community.description}</p>
-          </li>
-        ))}
-      </ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {communities.map((community) => (
+            <Card
+              key={community._id}
+              title={community.name}
+              description={community.description}
+              onJoin={() => navigate(`/community/${community._id}`)}
+              onView={() => navigate(`/community/${community._id}`)}
+            />
+          ))}
+        </div>
 
-      <div className="mb-6">
-        <button
-          onClick={() => navigate('/community/create')}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          Create a Community
-        </button>
+        <div className="text-center mt-8">
+          <button
+            onClick={() => navigate('/community/create')}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Create a Community
+          </button>
+        </div>
       </div>
     </div>
   );

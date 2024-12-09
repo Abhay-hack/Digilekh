@@ -1,32 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { apiInstance } from '../axios';
-import BlogCard from "../components/BlogCard";
-import Header from "../components/Header";  // Import the Header Component
+import BlogCard from "../components/BlogCard";  // Import BlogCard
+import Header from "../components/Header";
+import Loader from "../components/Loader";  // Import the Loader component
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true); // Added loading state
-  const [error, setError] = useState(""); // Added error state
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(""); // Error state
 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await apiInstance.get("/blog");  // API endpoint adjusted
-        setBlogs(response.data.blogs);  // Assuming response contains an array of blogs
-        setLoading(false);  // Set loading to false when data is fetched
+        const response = await apiInstance.get("/blog");
+        setBlogs(response.data.blogs);
+        setLoading(false);
       } catch (error) {
         setError("Error fetching blogs. Please try again later.");
-        setLoading(false);  // Set loading to false even if there was an error
+        setLoading(false);
         console.error("Error fetching blogs:", error.response ? error.response.data : error.message);
       }
     };
 
-    fetchBlogs();
-  }, []); // Empty dependency array means this runs only once on component mount
+    // Set a minimum loading time to show loader for at least 2 seconds
+    setTimeout(() => {
+      fetchBlogs();
+    }, 1000); 
+  }, []); 
 
   if (loading) {
-    return <div className="text-center py-4">Loading blogs...</div>;
+    return <Loader />;  // Use Loader component while loading
   }
 
   if (error) {
@@ -35,23 +39,28 @@ const Blogs = () => {
 
   return (
     <div>
-      {/* Include the Header component */}
       <Header />
 
-      <div className="blogs-page p-4">
-        <h2 className="text-2xl font-semibold mb-4">Blogs</h2>
+      <div className="blogs-page max-w-7xl mx-auto px-4 py-10">
+        <h2 className="text-4xl font-semibold text-gray-900 text-center mb-10">Available Blogs</h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {blogs.length === 0 ? (
-            <div className="text-center col-span-full">No blogs available</div>
-          ) : (
-            blogs.map((blog) => (
-              <Link to={`/api/blog/${blog._id}`} key={blog.id}>
-                <BlogCard blog={blog} />
+        {blogs.length === 0 ? (
+          <div className="text-center text-gray-500">
+            <p className="text-lg mb-4">There are no blogs available right now.</p>
+            <p className="text-md mb-6">We're working on adding fresh content. Stay tuned!</p>
+            <Link to="/create-blog" className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition duration-200">
+              Create Your Blog
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+            {blogs.map((blog) => (
+              <Link to={`/api/blog/${blog._id}`} key={blog._id}>
+                <BlogCard blog={blog} />  {/* Using the BlogCard component */}
               </Link>
-            ))
-          )}
-        </div>
+            ))} 
+          </div>
+        )}
       </div>
     </div>
   );

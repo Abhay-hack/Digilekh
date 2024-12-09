@@ -84,7 +84,7 @@ async function handleDeleteCommunity(req, res) {
             return res.status(403).json({ error: 'You are not authorized to delete this community' });
         }
 
-        await community.remove(); // Remove the community
+        await community.remove;
 
         // Emit the "communityDeleted" event
         const io = getIo();
