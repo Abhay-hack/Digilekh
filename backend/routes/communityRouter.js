@@ -14,7 +14,7 @@ const io = require('../index').io;  // Import the io instance to emit events
 router.post('/create', authenticate, handleCreateCommunity);
 
 // Get all communities
-router.get('/', authenticate, handleGetCommunity);
+router.get('/community', authenticate, handleGetCommunity);
 
 // Get details of a specific community
 router.get('/:communityId', handleIndividualCommunity);

@@ -14,7 +14,7 @@ const CommunityList = () => {
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
-        const response = await communityInstance.get('/');
+        const response = await communityInstance.get('/community');
         setCommunities(response.data.communities);
         setLoading(false);
       } catch (err) {

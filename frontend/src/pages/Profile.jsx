@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiInstance, userInstance, communityInstance } from '../axios';
 import Header from '../components/Header';
 import Loader from '../components/Loader';
+import Sidebar from '../components/Sidebar';
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);

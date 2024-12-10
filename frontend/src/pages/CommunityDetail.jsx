@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useParams, useNavigate } from 'react-router-dom';
+import EmojiPicker from "emoji-picker-react";
 import Header from '../components/Header'; // Assuming you have a header component
 
 // Connect to the socket server
@@ -14,6 +15,17 @@ const CommunityDetail = () => {
   const [error, setError] = useState(null); // For handling errors
   const [isCreator, setIsCreator] = useState(false); // Flag to check if the user is the creator
   const navigate = useNavigate();
+  const emojiPickerRef = useRef(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emojiTarget, setEmojiTarget] = useState(null);
+  const emojiButtonRef = useRef(null); // Reference to the emoji button
+
+  const handleEmojiClick = (emojiObject) => {
+    if (emojiTarget === "message") {
+      setMessage(prev => prev + emojiObject.emoji); // Add emoji to message input
+    }
+    setShowEmojiPicker(false); // Hide the emoji picker after selecting
+  };
 
   useEffect(() => {
     // Fetch community details
@@ -37,7 +49,7 @@ const CommunityDetail = () => {
     socket.emit('joinRoom', communityId);
 
     socket.on('receiveMessage', (newMessage) => {
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      setMessages(prevMessages => [...prevMessages, newMessage]);
     });
 
     socket.on('error', (err) => {
@@ -56,24 +68,12 @@ const CommunityDetail = () => {
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      await fetch(`/community/${communityId}`, { method: 'DELETE' });
-      setMessage('Community deleted successfully');
-      setTimeout(() => {
-        navigate('/community'); // Redirect after deletion
-      }, 2000);
-    } catch (err) {
-      console.error('Error deleting community:', err);
-      setError('Failed to delete community.');
-    }
-  };
-
   return (
     <div className="bg-gray-100 min-h-screen">
       <Header /> {/* Include your header component */}
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8 mt-10 mb-16">
-      <h1 className='text-4xl'>Chat-Room</h1>
+        <h1 className='text-4xl'>Chat-Room</h1>
+
         {/* Community Info Section */}
         {community && community.name && (
           <div className="mb-8 p-4 bg-white shadow-lg rounded-lg">
@@ -96,10 +96,10 @@ const CommunityDetail = () => {
         </div>
 
         {/* Chat Input Section */}
-        
         <div className="flex flex-col space-y-4">
           <div className="flex space-x-4 items-center">
             <input
+              id="message"
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -110,6 +110,17 @@ const CommunityDetail = () => {
               placeholder="Type your message..."
             />
             <button
+              ref={emojiButtonRef} // Assign ref to emoji button
+              type="button"
+              className="ml-2 text-blue-500 hover:text-blue-700 focus:outline-none mt-1"
+              onClick={() => {
+                setEmojiTarget("message"); // Set target to message input
+                setShowEmojiPicker((prev) => !prev);
+              }}
+            >
+              😊
+            </button>
+            <button
               onClick={handleSendMessage}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -117,9 +128,6 @@ const CommunityDetail = () => {
             </button>
           </div>
         </div>
-
-        {/* Success Message */}
-        {message && <div className="text-green-500 text-center mt-2">{message}</div>}
 
         {/* Delete Community button, shown only if the user is the creator */}
         {isCreator && (
@@ -133,6 +141,21 @@ const CommunityDetail = () => {
           </div>
         )}
       </div>
+
+      {/* Emoji Picker */}
+      {showEmojiPicker && (
+        <div
+          ref={emojiPickerRef}
+          className="absolute bg-white shadow-lg rounded-md border p-2"
+          style={{
+            top: `${emojiButtonRef.current?.getBoundingClientRect().top + window.scrollY - 400}px`, // Adjust position below the emoji button
+            left: `${emojiButtonRef.current?.getBoundingClientRect().right}px`, // Align with the emoji button
+            zIndex: 10,
+          }}
+        >
+          <EmojiPicker onEmojiClick={handleEmojiClick} />
+        </div>
+      )}
     </div>
   );
 };

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiInstance } from "../axios";
 import Header from "../components/Header";
+import EmojiPicker from "emoji-picker-react";
 
 const BlogPost = () => {
   const navigate = useNavigate();
@@ -11,10 +12,21 @@ const BlogPost = () => {
   const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emojiTarget, setEmojiTarget] = useState(null); // Track which input is targeted
+  const emojiPickerRef = useRef(null); // Ref for emoji picker container
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) setImageFile(file);
+  };
+
+  const handleEmojiClick = (emojiObject) => {
+    if (emojiTarget === "title") {
+      setTitle((prev) => prev + emojiObject.emoji);
+    } else if (emojiTarget === "content") {
+      setContent((prev) => prev + emojiObject.emoji);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -55,7 +67,7 @@ const BlogPost = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen relative">
       <Header />
       <div className="mt-8 max-w-3xl mx-auto bg-white shadow-md rounded-lg p-8">
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">
@@ -68,33 +80,47 @@ const BlogPost = () => {
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title Input */}
-          <div>
+          <div className="relative">
             <label htmlFor="title" className="block text-sm font-medium text-gray-700">
               Blog Title
             </label>
-            <input
-              type="text"
-              id="title"
-              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
+            <div className="flex items-center">
+              <input
+                type="text"
+                id="title"
+                className="w-full mt-1 px-4 py-2  border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           {/* Content Input */}
-          <div>
+          <div className="relative">
             <label htmlFor="content" className="block text-sm font-medium text-gray-700">
               Blog Content
             </label>
-            <textarea
-              id="content"
-              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 resize-none"
-              rows={8}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              required
-            />
+            <div className="flex items-start">
+              <textarea
+                id="content"
+                className="w-full mt-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 resize-none"
+                rows={8}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="ml-2 text-blue-500 hover:text-blue-700 focus:outline-none mt-1"
+                onClick={() => {
+                  setEmojiTarget("content");
+                  setShowEmojiPicker((prev) => !prev);
+                }}
+              >
+                😊
+              </button>
+            </div>
           </div>
 
           {/* Image Upload */}
@@ -122,6 +148,22 @@ const BlogPost = () => {
           </div>
         </form>
       </div>
+
+      {/* Emoji Picker */}
+      {showEmojiPicker && (
+        <div
+          ref={emojiPickerRef}
+          className="absolute bg-white shadow-lg rounded-md border p-2"
+          style={{
+            top: `${emojiTarget === "title" ? "100px" : "280px"}`, // Adjust top dynamically
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 10,
+          }}
+        >
+          <EmojiPicker onEmojiClick={handleEmojiClick} />
+        </div>
+      )}
     </div>
   );
 };
