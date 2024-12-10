@@ -92,6 +92,7 @@ To set up the backend, you need to install the following dependencies:
    ```sh
    npm i
    npm install react-router-dom axios socket.io-client styled-components moment
+   npm i react-icons emoji-picker-react
 
 # How to run
 ```sh
