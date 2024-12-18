@@ -32,7 +32,7 @@ const CommunityList = () => {
   if (error) return <div className="text-red-500 bg-red-100 p-4 rounded-md">{error}</div>;
   if (communities.length === 0) {
     return (
-      <div className="text-center">
+      <div className="text-center ">
         <p>No communities available. Why not create one?</p>
         <button
           onClick={() => navigate('/community/create')}
@@ -45,9 +45,9 @@ const CommunityList = () => {
   }
 
   return (
-    <div className="community-list px-6 lg:px-12">
+    <div className="community-list bg-[#86DEB7] min-h-screen px-6 lg:px-12">
       <Header />
-      <div className="mt-4"> {/* Adjusted margin-top */}
+      <div className="mt-4 "> {/* Adjusted margin-top */}
         <h2 className="text-2xl font-bold mb-6 text-center">
           Available Communities
         </h2>
@@ -67,7 +67,7 @@ const CommunityList = () => {
         <div className="text-center mt-8">
           <button
             onClick={() => navigate('/community/create')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-black text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Create a Community
           </button>

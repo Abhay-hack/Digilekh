@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>Weather Forecast</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="search-box">
+            <input type="text" placeholder="Enter city name" id="search-input">
+            <button id="search-button"><i class="fas fa-search"></i></button>
+        </div>
+        
+        <div class="weather-box">
+            <div class="location">
+                <h2 id="city">Weather Forecast</h2>
+                <p id="date"></p>
+            </div>
+            
+            <div class="current-weather">
+                <div class="details">
+                    <h1 id="temperature">--°C</h1>
+                    <p id="description">--</p>
+                </div>
+                <div class="weather-icon">
+                    <img src="" alt="weather icon" id="weather-icon">
+                </div>
+            </div>
+            
+            <div class="weather-details">
+                <div class="detail">
+                    <i class="fas fa-temperature-high"></i>
+                    <div>
+                        <p>Feels Like</p>
+                        <p id="feels-like">--°C</p>
+                    </div>
+                </div>
+                <div class="detail">
+                    <i class="fas fa-tint"></i>
+                    <div>
+                        <p>Humidity</p>
+                        <p id="humidity">--%</p>
+                    </div>
+                </div>
+                <div class="detail">
+                    <i class="fas fa-wind"></i>
+                    <div>
+                        <p>Wind Speed</p>
+                        <p id="wind-speed">-- km/h</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

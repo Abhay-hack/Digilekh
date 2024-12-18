@@ -23,14 +23,13 @@ const Blogs = () => {
       }
     };
 
-    // Set a minimum loading time to show loader for at least 2 seconds
     setTimeout(() => {
       fetchBlogs();
     }, 1000); 
   }, []); 
 
   if (loading) {
-    return <Loader />;  // Use Loader component while loading
+    return <Loader />;
   }
 
   if (error) {
@@ -38,7 +37,7 @@ const Blogs = () => {
   }
 
   return (
-    <div>
+    <div className="bg-[#86DEB7]">
       <Header />
 
       <div className="blogs-page max-w-7xl mx-auto px-4 py-10">

@@ -1,15 +1,15 @@
 import React from 'react';
-import Header from './Header';  // Assuming you have a Header component
-import Footer from './Footer';  // Assuming you have a Footer component
+import Header from './Header'; 
+import Footer from './Footer'; 
 import profilePlaceholder from "../assets/rb_451.png";
 
 const About = () => {
   return (
     <div>
       <Header />
-      <div className="container mx-auto py-12 px-6">
-        <div className="flex items-center justify-between space-x-8">
-          {/* Left Section: Text Content */}
+      <div className="container bg-[#86DEB7] mx-auto py-12 px-6">
+        <div className="flex items-center  justify-between space-x-8">
+          
           <div className="w-1/2 text-left">
             <h1 className="text-4xl font-mono font-bold text-gray-800 mb-4">
               About Us
@@ -25,10 +25,10 @@ const About = () => {
             </p>
           </div>
 
-          {/* Right Section: Image or Graphics */}
+          
           <div className="w-1/2">
             <img
-              src= {profilePlaceholder} // Replace with your image URL
+              src= {profilePlaceholder} 
               alt="About Us"
               className="rounded-lg w-full h-full object-cover"
             />

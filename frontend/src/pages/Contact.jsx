@@ -4,7 +4,7 @@ import Footer from "./Footer";
 
 const Contact = () => {
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
+    <div className="bg-[#86DEB7] min-h-screen flex flex-col">
       <Header />
 
       {/* Main Content */}
@@ -18,7 +18,7 @@ const Contact = () => {
         </div>
 
         {/* Contact Form */}
-        <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <div className="max-w-lg mx-auto bg-[#D6D3F0] p-6 rounded-lg shadow-lg">
           <form action="#" method="POST">
             {/* Name Field */}
             <div className="mb-4">
@@ -30,7 +30,7 @@ const Contact = () => {
                 id="name"
                 name="name"
                 placeholder="Your Name"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-black"
                 required
               />
             </div>
@@ -45,7 +45,7 @@ const Contact = () => {
                 id="email"
                 name="email"
                 placeholder="Your Email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
                 required
               />
             </div>
@@ -60,7 +60,7 @@ const Contact = () => {
                 name="message"
                 placeholder="Your Message"
                 rows="5"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
                 required
               ></textarea>
             </div>

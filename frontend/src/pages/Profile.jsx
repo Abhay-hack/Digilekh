@@ -119,24 +119,24 @@ const Profile = () => {
   }
 
   return (
-    <div className="profile-page min-h-screen bg-gray-50 py-0 px-8"> {/* Removed extra padding */}
+    <div className="profile-page min-h-screen bg-[#86DEB7] py-0 px-8"> {/* Removed extra padding */}
       <Header />
       <div className="container max-w-4xl mx-auto mt-8"> {/* Added margin top here */}
-        <div className="profile-header mb-12 flex flex-col items-center bg-white shadow-lg p-8 rounded-lg">
+        <div className="profile-header mb-12 flex flex-col items-center bg-[#F5ECCD] shadow-lg p-8 rounded-lg">
           <h2 className="text-3xl font-semibold text-gray-800 mb-4">Hello, {userData?.fullname || 'User'}</h2>
           <p className="text-lg text-gray-600 mb-4">Email: {userData?.email}</p>
         </div>
 
         {/* Blogs Section */}
-        <div className="user-blogs mt-8">
+        <div className=" user-blogs mt-8">
           <h3 className="text-2xl font-semibold mb-6">Your Blogs:</h3>
           {blogs.length > 0 ? (
             <ul className="space-y-6">
               {blogs.map((blog) => (
-                <li key={blog._id} className="bg-white p-6 shadow-md rounded-lg hover:shadow-xl transition duration-200">
+                <li key={blog._id} className="bg-[#D6D3F0] p-6 shadow-md rounded-lg hover:shadow-xl transition duration-200">
                   <h4 className="text-xl font-semibold text-gray-800">{blog.title}</h4>
                   <p className="text-gray-600 mt-2">{blog.content.slice(0, 100)}...</p>
-                  <a href={`/api/blog/${blog._id}`} className="text-blue-500 hover:text-blue-700 mt-2 inline-block">Read more</a><br />
+                  <a href={`/api/blog/${blog._id}`} className="text-black-500 hover:underline hover:text-blue-700 mt-2 inline-block">Read more</a><br />
                   <button
                     onClick={() => handleDeleteBlog(blog._id)}
                     className="mt-4 text-red-500 hover:text-red-700 focus:outline-none"
@@ -157,11 +157,11 @@ const Profile = () => {
           {communities.length > 0 ? (
             <ul className="space-y-6">
               {communities.map((community) => (
-                <li key={community._id} className="bg-white p-6 shadow-md rounded-lg hover:shadow-xl transition duration-200">
+                <li key={community._id} className="bg-[#D6D3F0] p-6 shadow-md rounded-lg hover:shadow-xl transition duration-200">
                   <h4 className="text-xl font-semibold text-gray-800">{community.name}</h4>
                   <p className="text-gray-600 mt-2">{community.description}</p>
                   <p className="text-gray-500 text-sm">Created by: {community.creator.fullname}</p>
-                  <a href={`/community/${community._id}`} className="text-blue-500 hover:text-blue-700 mt-2 inline-block">Read more</a><br />
+                  <a href={`/community/${community._id}`} className="text-black-500 hover:underline hover:text-blue-700 mt-2 inline-block">Read more</a><br />
                   <button
                     onClick={() => handleDeleteCommunity(community._id)}
                     className="mt-4 text-red-500 hover:text-red-700 focus:outline-none"

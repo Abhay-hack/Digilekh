@@ -1,4 +1,4 @@
-const {mongoose} = require('mongoose');
+const { mongoose } = require('mongoose');
 
 const blogSchema = new mongoose.Schema({
     title: {
@@ -16,14 +16,18 @@ const blogSchema = new mongoose.Schema({
     },
     comments: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Comment' }
-    ],
+        ref: 'Comment'
+    }],
     image: {
         type: String
     },
     published: {
         type: Boolean,
         default: false
+    },
+    likeCount: {
+        type: Number,
+        default: 0 // Initializes like count at zero
     },
     createdAt: { 
         type: Date,

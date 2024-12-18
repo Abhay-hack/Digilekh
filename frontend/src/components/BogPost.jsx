@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiInstance } from "../axios";
 import Header from "../components/Header";
 import EmojiPicker from "emoji-picker-react";
+import Loader from "../components/Loader"; 
 
 const BlogPost = () => {
   const navigate = useNavigate();
@@ -61,15 +62,21 @@ const BlogPost = () => {
     } catch (error) {
       setError("Failed to post the blog. Please try again later.");
       console.error("Error posting blog:", error.response?.data || error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
+  setTimeout(() => {
+    fetchBlogs();
+  }, 1000); 
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
-    <div className="bg-gray-50 min-h-screen relative">
+    <div className="bg-[#86DEB7] min-h-screen relative">
       <Header />
-      <div className="mt-8 max-w-3xl mx-auto bg-white shadow-md rounded-lg p-8">
+      <div className="mt-8 max-w-3xl mx-auto bg-[#D6D3F0] shadow-md rounded-lg p-8">
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">
           Create a New Blog
         </h2>
@@ -123,7 +130,6 @@ const BlogPost = () => {
             </div>
           </div>
 
-          {/* Image Upload */}
           <div>
             <label htmlFor="image" className="block text-sm font-medium text-gray-700">
               Upload Cover Image (Optional)
@@ -136,11 +142,10 @@ const BlogPost = () => {
             />
           </div>
 
-          {/* Submit Button */}
           <div className="flex justify-end">
             <button
               type="submit"
-              className="bg-blue-600 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-black text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               {loading ? "Posting..." : "Post Blog"}
@@ -157,7 +162,7 @@ const BlogPost = () => {
           style={{
             top: `${emojiTarget === "title" ? "100px" : "280px"}`, // Adjust top dynamically
             left: "50%",
-            transform: "translateX(-50%)",
+            transform: "translateX(-50%)",  
             zIndex: 10,
           }}
         >

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const Loader = () => {
   return (
     <StyledWrapper>
-      <div className="socket">
+      <div className="socket ">
         <div className="gel center-gel">
           <div className="hex-brick h1" />
           <div className="hex-brick h2" />

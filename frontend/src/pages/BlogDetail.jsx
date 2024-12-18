@@ -38,7 +38,7 @@ const BlogDetail = () => {
   return (
     <div>
       <Header />
-      <div className="container mx-auto px-4 lg:px-8 py-8">
+      <div className="container mx-auto px-4 bg-[#F5ECCD] lg:px-8 py-8">
         <article className="max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold leading-tight text-gray-900 mb-6">{blog.title}</h1>
           <div className="flex items-center text-sm text-gray-600 mb-6">

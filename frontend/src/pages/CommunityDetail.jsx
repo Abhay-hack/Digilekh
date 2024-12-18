@@ -69,9 +69,9 @@ const CommunityDetail = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-[#86DEB7] min-h-screen">
       <Header /> {/* Include your header component */}
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8 mt-10 mb-16">
+      <div className="max-w-4xl mx-auto bg-[#C7CEDB] rounded-lg shadow-lg p-8 mt-10 mb-16">
         <h1 className='text-4xl'>Chat-Room</h1>
 
         {/* Community Info Section */}
@@ -106,7 +106,7 @@ const CommunityDetail = () => {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleSendMessage();
               }}
-              className="border border-gray-300 p-3 w-full rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+              className="border border-gray-300 p-3 w-full rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition duration-200"
               placeholder="Type your message..."
             />
             <button
