@@ -46,6 +46,7 @@ To set up the backend, you need to install the following dependencies:
    PORT=your-port-number
    MONGO_URI=your-mongo-uri
    JWT_SECRET=your-jwt-secret
+   NODE_ENV=production
 
 ## 🗂️ Backend Folder Structure:
    ```sh
