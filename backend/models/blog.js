@@ -29,6 +29,10 @@ const blogSchema = new mongoose.Schema({
         type: Number,
         default: 0 // Initializes like count at zero
     },
+    likes: {
+        type: [mongoose.Schema.Types.ObjectId],  // Ensure likes is an array of ObjectId
+        default: []  // Initialize likes as an empty array
+    },
     createdAt: { 
         type: Date,
         default: Date.now 

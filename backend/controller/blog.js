@@ -290,6 +290,46 @@ async function handleUpdateComment(req, res) {
 }
 
 
+async function handleLikeBlog(req, res) {
+    try {
+        const token = req.cookies.authToken;
+        if (!token) {
+            return res.status(401).json({ error: 'No token provided' });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+        const { blogId } = req.params;
+
+        // Find the blog
+        const blog = await Blog.findById(blogId);
+        if (!blog) {
+            return res.status(404).json({ error: 'Blog not found' });
+        }
+
+        // Check if the user already liked the blog
+        const alreadyLiked = blog.likes.includes(userId);
+
+        if (alreadyLiked) {
+            // User is unliking the blog
+            blog.likes = blog.likes.filter(id => id.toString() !== userId.toString());
+        } else {
+            // User is liking the blog
+            blog.likes.push(userId);
+        }
+
+        // Save the updated blog
+        await blog.save();
+
+        return res.status(200).json({ message: alreadyLiked ? 'Blog unliked' : 'Blog liked', likes: blog.likes.length });
+    } catch (error) {
+        console.error('Error liking blog:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+
+
 module.exports = {
     handleBlogPost,
     handleCommentPost,
@@ -300,4 +340,5 @@ module.exports = {
     handleUpdateBlog,
     handleUpdateComment,
     handleFetchComments,
+    handleLikeBlog,
 }
