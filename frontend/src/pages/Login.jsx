@@ -61,7 +61,7 @@ const Login = () => {
         <div className="mt-8 text-center">
           <p className="text-lg text-black">
             Don't have an account?{' '}
-            <a href="/signup" className="font-bold underline">
+            <a href="/user/signup" className="font-bold underline">
               Sign Up
             </a>
           </p>

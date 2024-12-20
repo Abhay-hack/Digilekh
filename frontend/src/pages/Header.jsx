@@ -18,7 +18,7 @@ const Header = () => {
           <Link to="/about" className="hover:text-white transition duration-200">About Us</Link>
           <Link to="/contact" className="hover:text-white transition duration-200">Contact Us</Link>
           
-          <Link to="/signup">
+          <Link to="/user/signup">
             <Button /> 
           </Link>
         </nav>
