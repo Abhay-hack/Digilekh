@@ -1,12 +1,31 @@
-#✨ Digilekh
+# ✨ Digilekh
 
-**Digilekh** is a web application designed to manage .
+**Digilekh** is a full-stack web application designed to manage and share blogs and discussions within an interactive community. It empowers users to post content, comment on discussions, and join topic-based communities, all within a modern and intuitive interface.
 
+---
 
 ## 🔍 Project Overview
 
+Digilekh is a blogging and community discussion platform where users can:
+- Create and publish blog posts
+- Join or create topic-specific communities
+- Comment and engage with others in real time using Socket.IO
+- Authenticate and manage their profiles securely using JWT
+
+It features a responsive frontend built with **React.js**, and a powerful backend powered by **Node.js**, **Express.js**, and **MongoDB**.
+
+---
 
 ## 🚀 Features
+
+- 📝 Blog creation and editing  
+- 💬 Comment system with real-time updates  
+- 🧑‍🤝‍🧑 Community creation and participation  
+- 🔐 Secure user authentication (JWT)  
+- 📁 Image/file uploads using Multer  
+- 🌐 REST API integration with Axios  
+- 🎨 Styled using Styled-Components and React Icons  
+- ⚡ Real-time interaction using Socket.IO  
 
 ---
 
@@ -14,18 +33,18 @@
 
 To set up this project locally, follow these instructions:
 
-### 1. Backend
-To set up the backend, you need to install the following dependencies:
+### 🖥️ 1. Backend Setup
 
-- **Languages and Frameworks:**
-  - Node.js (runtime environment)
-  - Express.js (web framework)
+#### 🔧 Tech Stack
 
-- **Database:**
-  - MongoDB (or your chosen database)
+- **Languages and Frameworks:**  
+  Node.js, Express.js
 
-- **Others:**
-  - Any backend-specific packages listed in `package.json`.
+- **Database:**  
+  MongoDB
+
+- **Other Dependencies:**  
+  JSON Web Token, Multer, Socket.IO, Dotenv, CORS, Body-parser, Cookie-parser
 
 #### Steps to Install Backend Dependencies:
 1. Navigate to the `backend` directory:
@@ -79,13 +98,17 @@ To set up the backend, you need to install the following dependencies:
   nodemon index.js
 ```
 
-### 2. Frontend
+### 🌐 2. Frontend Setup
 To set up the backend, you need to install the following dependencies:
 
-  - **Languages and Frameworks:**
-  - React.js
+  ####🔧 Tech Stack
+    - **Languages and Frameworks:**  
+        React.js
 
-#### Steps to Install Backend Dependencies:
+    - **Other Dependencies:**
+       React Router DOM, Axios, Socket.IO Client, Styled Components, Moment, React Icons, Emoji Picker
+
+#### Steps to Install Frontend Dependencies:
 1. Navigate to the `frontend` directory:
    ```sh
    cd frontend
