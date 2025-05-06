@@ -99,13 +99,10 @@ To set up this project locally, follow these instructions:
 ```
 
 ### 🌐 2. Frontend Setup
-To set up the backend, you need to install the following dependencies:
-
-  ####🔧 Tech Stack
-    - **Languages and Frameworks:**  
+ ####🔧 Tech Stack
+  - **Languages and Frameworks:**  
         React.js
-
-    - **Other Dependencies:**
+  - **Other Dependencies:**
        React Router DOM, Axios, Socket.IO Client, Styled Components, Moment, React Icons, Emoji Picker
 
 #### Steps to Install Frontend Dependencies:
