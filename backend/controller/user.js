@@ -213,8 +213,5 @@ module.exports = {
     handleUserLogin,
     handleProfile,
     handleLogout,
-<<<<<<< HEAD
     authenticateToken,
-=======
->>>>>>> 564d154182067be0192440f8a59954d08b3e76e1
 };
