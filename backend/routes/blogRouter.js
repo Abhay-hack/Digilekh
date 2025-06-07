@@ -15,6 +15,7 @@ const {
     handleUpdateBlog,
     handleUpdateComment,
     handleFetchComments,
+    handleLikeBlog,
 } = require('../controller/blog');
 
 router.get('/blog', authenticate,handleBlog);
@@ -36,6 +37,7 @@ router.patch('/blog/:blogId/comment/:commentId', handleUpdateComment);
 
 router.delete('/blog/comment/:commentId', handleDeleteComment);
 
+router.post('/blog/:blogId/like', handleLikeBlog);
 
 
 module.exports = router;

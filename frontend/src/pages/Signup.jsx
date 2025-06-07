@@ -73,7 +73,7 @@ const Signup = () => {
         </form>
         <div className="mt-8 text-center">
           <Link
-            to="/login"
+            to="/user/login"
             className="text-lg text-black hover:underline"
           >
             Already have an account? Login
