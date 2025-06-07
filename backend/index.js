@@ -39,9 +39,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // CORS Configuration
+const allowedOrigins = [
+    'http://localhost:5173',                       // for local dev
+    'https://digilekh.vercel.app/'       // for production
+];
+
 const corsOptions = {
-    origin: 'http://localhost:5173', // Replace with frontend URL
-    methods: ['GET', 'POST', 'DELETE','PATCH'],
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
 };

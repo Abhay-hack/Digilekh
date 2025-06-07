@@ -1,26 +1,20 @@
 import axios from 'axios';
-// import axiosCookieJarSupport from 'axios-cookiejar-support';
-// import tough from 'tough-cookie';
 
-// const jar = new tough.CookieJar();
-
-// // Enhance Axios to support cookies
-// axiosCookieJarSupport(axios);
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const apiInstance = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: `${BASE_URL}/api`,
   withCredentials: true,
 });
 
 const userInstance = axios.create({
-  baseURL: 'http://localhost:5000/user',
+  baseURL: `${BASE_URL}/user`,
   withCredentials: true,
 });
 
 const communityInstance = axios.create({
-  baseURL: 'http://localhost:5000/community',
+  baseURL: `${BASE_URL}/community`,
   withCredentials: true,
 });
 
-export { apiInstance, userInstance , communityInstance };
-  
+export { apiInstance, userInstance, communityInstance };
