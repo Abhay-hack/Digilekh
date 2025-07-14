@@ -99,7 +99,7 @@ To set up this project locally, follow these instructions:
 ```
 
 ### 🌐 2. Frontend Setup
- ##🔧 Tech Stack
+ #### 🔧 Tech Stack
   - **Languages and Frameworks:**  
         React.js
   - **Other Dependencies:**
