@@ -1,49 +1,59 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { apiInstance } from "../axios";
-import moment from "moment"; // Import Moment.js for formatting timestamps
-import profilePlaceholder from "../assets/user.png"; // Replace with the path to your placeholder image
+import moment from "moment";
+import profilePlaceholder from "../assets/user.png";
 
 const CommentSection = ({ blogId }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const commentsEndRef = useRef(null);
 
-  // Fetch existing comments when the component is mounted
+  // Fetch comments
   useEffect(() => {
     const fetchComments = async () => {
+      setFetching(true);
       try {
-        const response = await apiInstance.get(`/blog/${blogId}/comment`);
-        setComments(response.data.comments); // Assuming your backend sends an array of comments
+        const res = await apiInstance.get(`/blog/${blogId}/comment`);
+        setComments(res.data.comments || []);
       } catch (err) {
-        console.error("Error fetching comments:", err.response?.data || err.message);
+        console.error("Error fetching comments:", err);
         setError("Unable to fetch comments. Please try again.");
+      } finally {
+        setFetching(false);
       }
     };
-
     fetchComments();
   }, [blogId]);
 
-  // Handle comment submission
+  // Scroll to last comment after update
+  useEffect(() => {
+    if (commentsEndRef.current) {
+      commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [comments]);
+
+  // Handle comment submit
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-
-    if (!newComment.trim()) return; // Prevent empty submissions
+    if (!newComment.trim()) return;
 
     try {
       setLoading(true);
       setError(null);
-      const response = await apiInstance.post(`/blog/${blogId}/comment`, {
-        content: newComment,
+      const res = await apiInstance.post(`/blog/${blogId}/comment`, {
+        content: newComment.trim(),
       });
 
-      // Add the new comment to the list of comments
-      setComments([...comments, response.data.comment]);
-      setNewComment(""); // Clear the input field
-      setLoading(false);
+      // Add new comment safely
+      setComments((prev) => [...prev, res.data.comment]);
+      setNewComment("");
     } catch (err) {
-      console.error("Error posting comment:", err.response?.data || err.message);
+      console.error("Error posting comment:", err);
       setError("Unable to post comment. Please try again.");
+    } finally {
       setLoading(false);
     }
   };
@@ -55,55 +65,59 @@ const CommentSection = ({ blogId }) => {
         Comments ({comments.length})
       </h2>
 
-      {/* Comment input form */}
+      {/* Input Form */}
       <form
         onSubmit={handleCommentSubmit}
-        className="flex items-center space-x-3 mb-6"
+        className="flex items-start space-x-3 mb-6"
       >
         <img
           src={profilePlaceholder}
           alt="Your Profile"
-          className="w-8 h-8 rounded-full"
+          className="w-9 h-9 rounded-full border"
         />
         <textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Write a comment..."
           className="flex-1 p-2 bg-white border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-black"
-          rows={1}
+          rows={2}
+          disabled={loading}
         />
         <button
           type="submit"
           className="px-4 py-2 bg-black text-white rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={loading}
         >
-          {loading ? "Submitting..." : "Post"}
+          {loading ? "Posting..." : "Post"}
         </button>
       </form>
 
-      {/* Error message */}
+      {/* Error */}
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      {/* List of comments */}
-      <div className="comments-list space-y-4">
-        {comments.length === 0 ? (
-          <p className="text-gray-500">No comments yet. Be the first to comment!</p>
+      {/* Comments */}
+      <div className="comments-list space-y-4 max-h-80 overflow-y-auto pr-2">
+        {fetching ? (
+          <p className="text-gray-500">Loading comments...</p>
+        ) : comments.length === 0 ? (
+          <p className="text-gray-500">
+            No comments yet. Be the first to comment!
+          </p>
         ) : (
           comments.map((comment) => (
             <div
               key={comment._id}
-              className="comment flex space-x-3 p-4 bg-gray-50 rounded-md shadow-sm"
+              className="comment flex space-x-3 p-3 bg-gray-50 rounded-md shadow-sm"
             >
-              {/* Profile Picture */}
               <img
                 src={comment.author?.profilePicture || profilePlaceholder}
                 alt={comment.author?.fullname || "Anonymous"}
-                className="w-8 h-8 rounded-full"
+                className="w-9 h-9 rounded-full border"
+                onError={(e) => (e.target.src = profilePlaceholder)}
               />
 
-              {/* Comment Content */}
               <div className="flex-1">
-                {/* Comment Header */}
+                {/* Header */}
                 <div className="flex justify-between items-center">
                   <h3 className="font-semibold text-gray-800">
                     {comment.author?.fullname || "Anonymous"}
@@ -112,12 +126,13 @@ const CommentSection = ({ blogId }) => {
                     {moment(comment.createdAt).fromNow()}
                   </span>
                 </div>
-                {/* Comment Text */}
+                {/* Content */}
                 <p className="text-gray-700 mt-1">{comment.content}</p>
               </div>
             </div>
           ))
         )}
+        <div ref={commentsEndRef} />
       </div>
     </div>
   );

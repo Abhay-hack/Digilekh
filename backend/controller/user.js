@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { randomBytes, createHmac } = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -30,6 +31,7 @@ async function handleUserSignup(req, res) {
             password: hashedPassword,
         });
 
+
         // Log for debugging
         console.log('Stored in DB (hashed by middleware):', user.password);
 
@@ -55,15 +57,6 @@ async function handleUserLogin(req, res) {
     try {
         const { email, password } = req.body;
 
-<<<<<<< HEAD
-        console.log('Login Request Body:', req.body);
-
-        if (!email?.trim() || !password?.trim()) {
-            return res.status(400).json({ error: 'Both email and password are required' });
-        }
-
-        const user = await User.findOne({ email: email.toLowerCase() });
-=======
         // Log email and password for debugging
         console.log('Login Attempt:', { email, password });
 
@@ -73,30 +66,10 @@ async function handleUserLogin(req, res) {
 
         // Search for user by email
         const user = await User.findOne({ email });
->>>>>>> 564d154182067be0192440f8a59954d08b3e76e1
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-<<<<<<< HEAD
-        // Compare passwords using bcrypt
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Invalid email or password' });
-        }
-
-        // Sign JWT token
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'defaultsecret', {
-            expiresIn: '1h',
-        });
-
-        res.cookie('authToken', token, {
-            httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            maxAge: 3600000, // 1 hour
-        });
-
-=======
         // Log the user object retrieved for debugging
         console.log('User Object Retrieved:', user);
 
@@ -124,8 +97,16 @@ async function handleUserLogin(req, res) {
             maxAge: 3600000, // 1 hour
         });
 
->>>>>>> 564d154182067be0192440f8a59954d08b3e76e1
-        return res.status(200).json({ message: 'Login successful', token });
+        return res.status(200).json({ 
+    message: 'Login successful', 
+    user: { 
+        fullname: user.fullname, 
+        email: user.email,
+        avatarUrl: user.avatarUrl || null 
+    },
+    token 
+});
+
     } catch (error) {
         console.error('Login Error:', { error: error.message, stack: error.stack });
         return res.status(500).json({ error: 'Internal Server Error' });
@@ -138,32 +119,15 @@ async function handleProfile(req, res) {
     try {
         const userId = req.user?.userId;
 
-<<<<<<< HEAD
         console.log('Fetching Profile for User ID:', userId);
 
         const user = await User.findById(userId).select('-password');
-=======
-        const user = await User.findById(userId).select('-password -salt');
->>>>>>> 564d154182067be0192440f8a59954d08b3e76e1
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-<<<<<<< HEAD
         const communities = await Community.find({ creator: userId }).populate('creator', 'fullname email');
         const blogs = await Blog.find({ author: userId });
-=======
-        const { page = 1, limit = 10 } = req.query;
-
-        const communities = await Community.find({ creator: userId })
-            .populate('creator', 'fullname email')
-            .skip((page - 1) * limit)
-            .limit(limit);
-
-        const blogs = await Blog.find({ author: userId })
-            .skip((page - 1) * limit)
-            .limit(limit);
->>>>>>> 564d154182067be0192440f8a59954d08b3e76e1
 
         return res.status(200).json({ user, blogs, communities });
     } catch (error) {
@@ -177,11 +141,7 @@ async function handleLogout(req, res) {
     try {
         res.clearCookie('authToken', {
             httpOnly: true,
-<<<<<<< HEAD
             secure: false, // Set to true in production
-=======
-            secure: process.env.NODE_ENV === 'production',
->>>>>>> 564d154182067be0192440f8a59954d08b3e76e1
             sameSite: 'strict',
         });
 

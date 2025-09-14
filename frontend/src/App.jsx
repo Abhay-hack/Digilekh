@@ -8,7 +8,7 @@ import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
-import BlogPost from './components/BogPost';
+import BlogPost from './components/BlogPost';
 import CommunityList from './pages/CommunityList';
 import CommunityDetail from './pages/CommunityDetail';
 import CommunityCreate from './pages/CommunityCreate';

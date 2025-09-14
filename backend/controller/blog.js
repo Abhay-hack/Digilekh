@@ -1,41 +1,42 @@
 const Blog = require('../models/blog');
 const Comment = require('../models/comment');
 const jwt = require('jsonwebtoken');
-const multer = require('multer');
-const path = require('path');
 require('dotenv').config();
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'uploads/');  // Store files in 'uploads' folder
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname));  // Add timestamp to file name
-    }
-  });
+const cloudinary = require('../cloudinaryConfig');
 
 
-  async function handleBlogPost(req, res) {
+// const multer = require('multer');
+// const path = require('path');
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//       cb(null, 'uploads/');  // Store files in 'uploads' folder
+//     },
+//     filename: (req, file, cb) => {
+//       cb(null, Date.now() + path.extname(file.originalname));  // Add timestamp to file name
+//     }
+//   });
+
+
+// Create a new blog
+async function handleBlogPost(req, res) {
     try {
         const token = req.cookies.authToken;
-        if (!token) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
+        if (!token) return res.status(401).json({ error: 'No token provided' });
 
-        const decoded = jwt.verify(token, 'Abhay');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId;
 
-        const { title, content, published } = req.body;
-        console.log(req.body);
+        const { title, content, published, image } = req.body;
+        if (!title || !content) return res.status(400).json({ error: 'Title and content are required' });
 
-        if (!title || !content) {
-            return res.status(400).json({ error: 'Title and content are required' });
-        }
-
-        // If file is uploaded, handle it
         let imageUrl = null;
-        if (req.file) {
-            imageUrl = `/uploads/${req.file.filename}`;  // Save image URL (path)
+
+        if (image) {
+            const result = await cloudinary.uploader.upload(image, {
+                folder: "digilekh_blog_images",
+                resource_type: "image",
+            });
+            imageUrl = result.secure_url;
         }
 
         const blog = await Blog.create({
@@ -48,10 +49,12 @@ const storage = multer.diskStorage({
 
         return res.status(201).json({ message: 'Blog created successfully', blog });
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error in handleBlogPost:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+
+
 
 async function handleFetchComments(req, res) {
     try {
@@ -81,72 +84,55 @@ async function handleFetchComments(req, res) {
 
 async function handleCommentPost(req, res) {
     try {
-        // Get the token from cookies
-        const token = req.cookies.authToken;
-        if (!token) {
-            return res.status(401).json({ error: 'Authentication token is missing.' });
-        }
-
-        // Decode the token to get the userId
-        const decoded = jwt.verify(token, "Abhay"); // Use environment variable for security
-        const userId = decoded.userId;
-
-        // Extract content and blogId from request
         const { blogId } = req.params;
         const { content } = req.body;
 
-        // Validate content
-        if (!content || content.trim() === '') {
-            return res.status(400).json({ error: 'Comment content cannot be empty.' });
+        if (!content) {
+            return res.status(400).json({ error: "Comment content is required" });
         }
 
-        // Find the blog post by ID
         const blog = await Blog.findById(blogId);
         if (!blog) {
-            return res.status(404).json({ error: 'Blog not found.' });
+            return res.status(404).json({ error: "Blog not found" });
         }
 
-        // Create a new comment object
+        // Create comment
         const comment = new Comment({
-            content: content.trim(),
-            author: userId, // Reference the user who made the comment
-            blogPost: blogId,
+            content,
+            author: req.user.userId, // from JWT
+            blogPost: blogId
         });
 
-        // Save the comment to the database
         await comment.save();
 
-        // Add the comment to the blog's comments array
+        // Push comment reference into blog
         blog.comments.push(comment._id);
         await blog.save();
 
-        // Populate the author's full name for the response
-        await comment.populate('author', 'fullname');
-
-        // Return the comment data in the response
         return res.status(201).json({
-            message: 'Comment posted successfully.',
-            comment: {
-                ...comment.toObject(),
-                author: comment.author.fullname,
-                createdAt: comment.createdAt,
-            },
+            message: "Comment added successfully",
+            comment
         });
-    } catch (error) {
-        console.error('Error in handleCommentPost:', error);
-        return res.status(500).json({ error: 'Internal Server Error. Please try again later.' });
+    } catch (err) {
+        console.error("Comment Error:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
     }
 }
 
-async function handleBlog(req,res){    
+// Fetch all blogs
+async function handleBlog(req, res) {
     try {
-    const blogs = await Blog.find().populate('author', 'fullname');
-    return res.status(200).json({ blogs });
-} catch (error) {
-    console.error("Error fetching blogs:", error);
-    return res.status(500).json({ message: "Failed to fetch blogs", error: error.message });
+        const blogs = await Blog.find()
+            .populate('author', 'fullname')
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({ blogs });
+    } catch (error) {
+        console.error("Error fetching blogs:", error);
+        return res.status(500).json({ message: "Failed to fetch blogs", error: error.message });
+    }
 }
-}
+
 
 async function handleDeleteComment(req, res) {
     try {
@@ -185,20 +171,21 @@ async function handleDeleteComment(req, res) {
     }
 }
 
+// Delete blog
 async function handleDeleteBlog(req, res) {
     try {
         const { blogId } = req.params;
-        if (!blogId) {
-            return res.status(400).json({ error: 'Blog ID is required' });
-        }
+        if (!blogId) return res.status(400).json({ error: 'Blog ID is required' });
 
         const blog = await Blog.findById(blogId);
-        if (!blog) {
-            return res.status(404).json({ error: 'Blog not found' });
+        if (!blog) return res.status(404).json({ error: 'Blog not found' });
+
+        if (blog.image) {
+            const publicId = blog.image.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(`digilekh_blog_images/${publicId}`, { resource_type: "image" });
         }
 
-        await Comment.deleteMany({ blog: blogId });
-
+        await Comment.deleteMany({ blogPost: blogId });
         await Blog.findByIdAndDelete(blogId);
 
         return res.status(200).json({ message: 'Blog and associated comments deleted successfully' });
@@ -208,14 +195,14 @@ async function handleDeleteBlog(req, res) {
     }
 }
 
-async function handleIndividualBlog(req,res){
+
+// Fetch individual blog
+async function handleIndividualBlog(req, res) {
     try {
         const { id } = req.params;
         const blog = await Blog.findById(id).populate('author', 'fullname');
 
-        if (!blog) {
-            return res.status(404).json({ error: 'Blog not found' });
-        }
+        if (!blog) return res.status(404).json({ error: 'Blog not found' });
 
         return res.status(200).json({ blog });
     } catch (error) {
@@ -224,109 +211,116 @@ async function handleIndividualBlog(req,res){
     }
 }
 
+
+// Update existing blog
 async function handleUpdateBlog(req, res) {
     try {
         const { blogId } = req.params;
-        const { title, content } = req.body;
-
-        // Debugging logs
-        console.log('Request Params:', req.params); // Check if blogId is correct
-        console.log('Request Body:', req.body); // Check if title and content are correct
+        const { title, content, image } = req.body;
 
         if (!blogId || !title || !content) {
             return res.status(400).json({ message: "Invalid input data." });
         }
 
-        const updatedBlog = await Blog.findByIdAndUpdate(
-            blogId,
-            { title, content },
-            { new: true }
-        );
+        const blog = await Blog.findById(blogId);
+        if (!blog) return res.status(404).json({ message: "Blog not found." });
 
-        if (!updatedBlog) {
-            return res.status(404).json({ message: "Blog not found." });
+        blog.title = title;
+        blog.content = content;
+
+        if (image) {
+            // Optional: remove old image from Cloudinary
+            if (blog.image) {
+                const publicId = blog.image.split('/').pop().split('.')[0];
+                await cloudinary.uploader.destroy(`digilekh_blog_images/${publicId}`, { resource_type: "image" });
+            }
+
+            const result = await cloudinary.uploader.upload(image, {
+                folder: "digilekh_blog_images",
+                resource_type: "image",
+            });
+            blog.image = result.secure_url;
         }
 
-        res.status(200).json({ message: "Blog updated successfully.", blog: updatedBlog });
+        const updatedBlog = await blog.save();
+        return res.status(200).json({ message: "Blog updated successfully.", blog: updatedBlog });
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({ message: "Error updating the blog.", error: error.message });
+        console.error('Error in handleUpdateBlog:', error);
+        return res.status(500).json({ message: "Error updating the blog.", error: error.message });
     }
 }
+
+
+
 
 
 async function handleUpdateComment(req, res) {
     try {
-        const { blogId, commentId } = req.params;  // Get both blogId and commentId from the URL
+        const { commentId } = req.params;  // Only need commentId
         const { text } = req.body;
 
-        if (!text) {
+        if (!text || text.trim() === '') {
             return res.status(400).json({ message: "Text is required to update the comment." });
         }
 
-        // Find the comment by its ID
         const comment = await Comment.findById(commentId);
-        if (!comment) {
-            return res.status(404).json({ message: "Comment not found." });
-        }
+        if (!comment) return res.status(404).json({ message: "Comment not found." });
 
-        // Check if the user is authorized to edit the comment
-        if (comment.author.toString() !== req.user._id.toString()) {
+        // Ensure the user updating is the author
+        if (comment.author.toString() !== req.user.userId) {
             return res.status(403).json({ message: "You are not authorized to edit this comment." });
         }
 
-        // Update the comment's text
-        comment.text = text;
+        comment.content = text.trim();  // Update the content
         const updatedComment = await comment.save();
 
-        // Optionally, you could populate the comment with the author's details (e.g., fullname)
-        await updatedComment.populate('author', 'fullname').execPopulate();
+        await updatedComment.populate('author', 'fullname');
 
-        // Return the updated comment
-        res.status(200).json({ message: "Comment updated successfully.", comment: updatedComment });
+        return res.status(200).json({ message: "Comment updated successfully.", comment: updatedComment });
     } catch (error) {
-        res.status(500).json({ message: "Error updating the comment.", error: error.message });
+        console.error('Error updating comment:', error);
+        return res.status(500).json({ message: "Error updating the comment.", error: error.message });
     }
 }
+
 
 
 async function handleLikeBlog(req, res) {
     try {
-        const token = req.cookies.authToken;
-        if (!token) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.userId;
         const { blogId } = req.params;
-
-        // Find the blog
         const blog = await Blog.findById(blogId);
+
         if (!blog) {
-            return res.status(404).json({ error: 'Blog not found' });
+            return res.status(404).json({ error: "Blog not found" });
         }
 
-        // Check if the user already liked the blog
+        const userId = req.user.userId;
         const alreadyLiked = blog.likes.includes(userId);
 
         if (alreadyLiked) {
-            // User is unliking the blog
-            blog.likes = blog.likes.filter(id => id.toString() !== userId.toString());
+            // Remove like
+            blog.likes = blog.likes.filter(id => id.toString() !== userId);
+            blog.likeCount = Math.max(0, blog.likeCount - 1);
         } else {
-            // User is liking the blog
+            // Add like
             blog.likes.push(userId);
+            blog.likeCount += 1;
         }
 
-        // Save the updated blog
         await blog.save();
 
-        return res.status(200).json({ message: alreadyLiked ? 'Blog unliked' : 'Blog liked', likes: blog.likes.length });
-    } catch (error) {
-        console.error('Error liking blog:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(200).json({
+            message: alreadyLiked ? "Like removed" : "Blog liked",
+            likes: blog.likes,
+            likeCount: blog.likeCount
+        });
+    } catch (err) {
+        console.error("Like Error:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
     }
 }
+
+
 
 
 
