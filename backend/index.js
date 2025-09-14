@@ -35,8 +35,9 @@ const io = socket.init(server); // Use the singleton for socket.io
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// Increase payload limits
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // CORS Configuration
 const allowedOrigins = [

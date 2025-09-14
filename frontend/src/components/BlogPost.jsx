@@ -51,9 +51,18 @@ const BlogPost = () => {
         image: imageData || null, // send Base64 directly
       };
 
-      await apiInstance.post("/blog/create", payload, {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("content", content);
+      if (imageData) {
+        const blob = await (await fetch(imageData)).blob();
+        formData.append("image", blob, "cover.png");
+      }
+
+      await apiInstance.post("/blog/create", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       });
 
