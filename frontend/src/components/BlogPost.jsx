@@ -32,48 +32,42 @@ const BlogPost = () => {
     else if (emojiTarget === "content") setContent((prev) => prev + emojiObject.emoji);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        setError("You must be logged in to post a blog.");
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      setError("");
+      
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          setError("You must be logged in to post a blog.");
+          setLoading(false);
+          return;
+        }
+      
+        // Send Base64 string directly
+        const payload = {
+          title,
+          content,
+          image: imageData || null, // this must be Base64
+        };
+      
+        await apiInstance.post("/blog/create", payload, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      
+        navigate("/api/blog");
+      } catch (error) {
+        setError("Failed to post the blog. Please try again later.");
+        console.error("Error posting blog:", error.response?.data || error.message);
+      } finally {
         setLoading(false);
-        return;
       }
+    };
 
-      const payload = {
-        title,
-        content,
-        image: imageData || null, // send Base64 directly
-      };
-
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("content", content);
-      if (imageData) {
-        const blob = await (await fetch(imageData)).blob();
-        formData.append("image", blob, "cover.png");
-      }
-
-      await apiInstance.post("/blog/create", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      navigate("/api/blog");
-    } catch (error) {
-      setError("Failed to post the blog. Please try again later.");
-      console.error("Error posting blog:", error.response?.data || error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) return <Loader />;
 

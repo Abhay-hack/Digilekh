@@ -20,20 +20,19 @@ const cloudinary = require('../cloudinaryConfig');
 // Create a new blog
 async function handleBlogPost(req, res) {
   try {
-    // Get token from cookies or Authorization header
     const token = req.cookies.authToken || req.headers["authorization"]?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token provided" });
 
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
 
     const { title, content, published, image } = req.body;
-    if (!title || !content) return res.status(400).json({ error: "Title and content are required" });
+    if (!title || !content)
+      return res.status(400).json({ error: "Title and content are required" });
 
     let imageUrl = null;
 
-    // Upload image to Cloudinary if provided
+    // Only upload to Cloudinary if image Base64 exists
     if (image) {
       try {
         const result = await cloudinary.uploader.upload(image, {
@@ -47,7 +46,6 @@ async function handleBlogPost(req, res) {
       }
     }
 
-    // Create blog
     const blog = await Blog.create({
       title,
       content,
@@ -62,6 +60,7 @@ async function handleBlogPost(req, res) {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
+
 
 
 async function handleFetchComments(req, res) {
