@@ -19,41 +19,39 @@ const cloudinary = require('../cloudinaryConfig');
 
 // Create a new blog
 async function handleBlogPost(req, res) {
-    try {
-        const token = req.cookies.authToken;
-        if (!token) return res.status(401).json({ error: 'No token provided' });
+  try {
+    const token = req.cookies.authToken || req.headers['authorization']?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'No token provided' });
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.userId;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
 
-        const { title, content, published, image } = req.body;
-        if (!title || !content) return res.status(400).json({ error: 'Title and content are required' });
+    const { title, content, published, image } = req.body;
+    if (!title || !content) return res.status(400).json({ error: 'Title and content are required' });
 
-        let imageUrl = null;
-
-        if (image) {
-            const result = await cloudinary.uploader.upload(image, {
-                folder: "digilekh_blog_images",
-                resource_type: "image",
-            });
-            imageUrl = result.secure_url;
-        }
-
-        const blog = await Blog.create({
-            title,
-            content,
-            author: userId,
-            published: published !== undefined ? published : true,
-            image: imageUrl,
-        });
-
-        return res.status(201).json({ message: 'Blog created successfully', blog });
-    } catch (error) {
-        console.error('Error in handleBlogPost:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+    let imageUrl = null;
+    if (image) {
+      const result = await cloudinary.uploader.upload(image, {
+        folder: "digilekh_blog_images",
+        resource_type: "image",
+      });
+      imageUrl = result.secure_url;
     }
-}
 
+    const blog = await Blog.create({
+      title,
+      content,
+      author: userId,
+      published: published !== undefined ? published : true,
+      image: imageUrl,
+    });
+
+    return res.status(201).json({ message: 'Blog created successfully', blog });
+  } catch (error) {
+    console.error('Error in handleBlogPost:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
 
 
 async function handleFetchComments(req, res) {
