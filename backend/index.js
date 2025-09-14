@@ -42,8 +42,8 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // CORS Configuration
 const allowedOrigins = [
-    'http://localhost:5173',                       // for local dev
-    'https://digilekh.vercel.app/'       // for production
+    'http://localhost:5173',         // local dev
+    'https://digilekh.vercel.app'   // production
 ];
 
 const corsOptions = {
@@ -54,11 +54,15 @@ const corsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: ['GET', 'POST', 'DELETE', 'PATCH'],
+    methods: ['GET', 'POST', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
 };
+
 app.use(cors(corsOptions));
+
+// Handle preflight requests for all routes
+app.options('*', cors(corsOptions));
 
 // Routes
 app.use('/community', communityRoute); // Community routes
