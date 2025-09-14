@@ -14,7 +14,11 @@ const userInstance = axios.create({
 
 const communityInstance = axios.create({
   baseURL: `${BASE_URL}/community`,
-  withCredentials: true,
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('authToken')}`, // adjust key as needed
+    'Content-Type': 'application/json',
+  },
 });
+
 
 export { apiInstance, userInstance, communityInstance };

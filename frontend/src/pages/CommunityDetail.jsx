@@ -1,11 +1,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
+import { communityInstance } from '../axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import EmojiPicker from "emoji-picker-react";
 import Header from '../components/Header'; // Assuming you have a header component
 
 // Connect to the socket server
-const socket = io('http://localhost:5000');
+const socket = io(import.meta.env.VITE_BACKEND_URL, {
+  transports: ["websocket", "polling"]
+});
 
 const CommunityDetail = () => {
   const { communityId } = useParams();
@@ -31,16 +34,21 @@ const CommunityDetail = () => {
     // Fetch community details
     const fetchCommunity = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/community/${communityId}`);
-        const communityData = await response.json();
-        setCommunity(communityData);
+        const token = localStorage.getItem('authToken');
+        if (token) {
+          communityInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }
 
-        // Check if the current user is the creator
-        // Assuming the user object is available via context or similar
-        // setIsCreator(currentUser.id === communityData.creatorId);
+        const response = await communityInstance.get(`/${communityId}`);
+        setCommunity(response.data);
+
+        // Optional: check if current user is the creator
+        // const currentUser = JSON.parse(localStorage.getItem('userInfo'));
+        // setIsCreator(currentUser._id === response.data.creatorId);
+
       } catch (err) {
         setError('Failed to fetch community details.');
-        console.error('Error fetching community:', err);
+        console.error('Error fetching community:', err.response ? err.response.data : err.message);
       }
     };
 

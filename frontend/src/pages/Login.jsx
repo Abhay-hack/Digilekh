@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { userInstance } from '../axios';
+import { apiInstance } from "../axios";
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
@@ -19,6 +20,8 @@ const Login = () => {
       localStorage.setItem('authToken', response.data.token);
       localStorage.setItem('userInfo', JSON.stringify(response.data.user));
 
+      // Set token for apiInstance (for blog fetch, etc.)
+      apiInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       // Navigate to blogs page
       navigate('/api/blog');
     } catch (err) {

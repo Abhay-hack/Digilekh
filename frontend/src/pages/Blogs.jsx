@@ -11,6 +11,11 @@ const Blogs = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      apiInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+
     const fetchBlogs = async () => {
       try {
         const response = await apiInstance.get("/blog");

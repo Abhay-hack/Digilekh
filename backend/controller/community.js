@@ -19,8 +19,9 @@ async function handleCreateCommunity(req, res) {
         const community = new Community({
             name,
             description,
-            creator: req.user.userId,
+            creator: req.userid,
         });
+        console.log('Creating community with:', { name, description, creator: req.user.userId });
 
         // Save the community to the database
         await community.save();
@@ -84,7 +85,7 @@ async function handleDeleteCommunity(req, res) {
             return res.status(403).json({ error: 'You are not authorized to delete this community' });
         }
 
-        await community.remove;
+        await community.remove();
 
         // Emit the "communityDeleted" event
         const io = getIo();

@@ -11,23 +11,28 @@ const CommunityCreate = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  e.preventDefault();
+  setLoading(true);
+  setError(null);
 
-    try {
-      await communityInstance.post('/create', { name, description });
+  try {
+    const token = localStorage.getItem('authToken');
+    await communityInstance.post(
+      '/create',
+      { name, description},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
       setSuccessMessage('Community created successfully!');
-      setTimeout(() => {
-        navigate('/community');
-      }, 2000);
+      setTimeout(() => navigate('/community'), 2000);
     } catch (err) {
-      console.error('Error creating community:', err);
-      setError('Failed to create community. Please try again.');
+      console.error('Error creating community:', err.response || err);
+      setError(err.response?.data?.error || 'Failed to create community. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#86DEB7]">
@@ -75,7 +80,7 @@ const CommunityCreate = () => {
           <button
             type="submit"
             className={`w-full py-2 rounded text-white ${
-              loading ? 'bg-black-' : 'bg-black hover:bg-blue-600'
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-blue-600'
             } transition duration-200`}
             disabled={loading}
           >

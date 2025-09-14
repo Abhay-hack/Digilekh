@@ -14,25 +14,31 @@ const CommunityList = () => {
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
+        const token = localStorage.getItem("authToken"); // Get token from localStorage
+        if (token) {
+          communityInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        }
+
         const response = await communityInstance.get('/community');
         setCommunities(response.data.communities);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching communities:', err);
-        setError('Unable to load communities. Please try again later.');
+        setError(err.response?.data?.error || 'Unable to load communities. Please try again later.');
         setLoading(false);
       }
     };
+
     setTimeout(() => {
       fetchCommunities();
     }, 1000); 
   }, []);
 
-  if (loading) return<Loader />;;
+  if (loading) return <Loader />;
   if (error) return <div className="text-red-500 bg-red-100 p-4 rounded-md">{error}</div>;
   if (communities.length === 0) {
     return (
-      <div className="text-center ">
+      <div className="text-center mt-10">
         <p>No communities available. Why not create one?</p>
         <button
           onClick={() => navigate('/community/create')}
@@ -47,7 +53,7 @@ const CommunityList = () => {
   return (
     <div className="community-list bg-[#86DEB7] min-h-screen px-6 lg:px-12">
       <Header />
-      <div className="mt-4 "> {/* Adjusted margin-top */}
+      <div className="mt-4">
         <h2 className="text-2xl font-bold mb-6 text-center">
           Available Communities
         </h2>
