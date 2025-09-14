@@ -20,24 +20,34 @@ const cloudinary = require('../cloudinaryConfig');
 // Create a new blog
 async function handleBlogPost(req, res) {
   try {
-    const token = req.cookies.authToken || req.headers['authorization']?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token provided' });
+    // Get token from cookies or Authorization header
+    const token = req.cookies.authToken || req.headers["authorization"]?.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "No token provided" });
 
+    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
 
     const { title, content, published, image } = req.body;
-    if (!title || !content) return res.status(400).json({ error: 'Title and content are required' });
+    if (!title || !content) return res.status(400).json({ error: "Title and content are required" });
 
     let imageUrl = null;
+
+    // Upload image to Cloudinary if provided
     if (image) {
-      const result = await cloudinary.uploader.upload(image, {
-        folder: "digilekh_blog_images",
-        resource_type: "image",
-      });
-      imageUrl = result.secure_url;
+      try {
+        const result = await cloudinary.uploader.upload(image, {
+          folder: "digilekh_blog_images",
+          resource_type: "image",
+        });
+        imageUrl = result.secure_url;
+      } catch (err) {
+        console.error("Cloudinary upload failed:", err);
+        return res.status(500).json({ error: "Image upload failed" });
+      }
     }
 
+    // Create blog
     const blog = await Blog.create({
       title,
       content,
@@ -46,10 +56,10 @@ async function handleBlogPost(req, res) {
       image: imageUrl,
     });
 
-    return res.status(201).json({ message: 'Blog created successfully', blog });
+    return res.status(201).json({ message: "Blog created successfully", blog });
   } catch (error) {
-    console.error('Error in handleBlogPost:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error in handleBlogPost:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 }
 
