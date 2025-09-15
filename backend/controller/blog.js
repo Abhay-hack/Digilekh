@@ -295,43 +295,38 @@ async function handleUpdateComment(req, res) {
 
 
 async function handleLikeBlog(req, res) {
-    try {
-        const { blogId } = req.params;
-        const blog = await Blog.findById(blogId);
+  try {
+    const { blogId } = req.params;
+    const blog = await Blog.findById(blogId);
 
-        if (!blog) {
-            return res.status(404).json({ error: "Blog not found" });
-        }
-
-        const userId = req.user.userId;
-        const alreadyLiked = blog.likes.includes(userId);
-
-        if (alreadyLiked) {
-            // Remove like
-            blog.likes = blog.likes.filter(id => id.toString() !== userId);
-            blog.likeCount = Math.max(0, blog.likeCount - 1);
-        } else {
-            // Add like
-            blog.likes.push(userId);
-            blog.likeCount += 1;
-        }
-
-        await blog.save();
-
-        return res.status(200).json({
-            message: alreadyLiked ? "Like removed" : "Blog liked",
-            likes: blog.likes,
-            likeCount: blog.likeCount
-        });
-    } catch (err) {
-        console.error("Like Error:", err);
-        return res.status(500).json({ error: "Internal Server Error" });
+    if (!blog) {
+      return res.status(404).json({ error: "Blog not found" });
     }
+
+    const userId = req.user.userId;
+    const alreadyLiked = blog.likes.includes(userId);
+
+    if (alreadyLiked) {
+      blog.likes = blog.likes.filter(id => id.toString() !== userId);
+      blog.likeCount = Math.max(0, blog.likeCount - 1);
+    } else {
+      blog.likes.push(userId);
+      blog.likeCount += 1;
+    }
+
+    await blog.save();
+
+    return res.status(200).json({
+      message: alreadyLiked ? "Like removed" : "Blog liked",
+      likes: blog.likes,
+      likeCount: blog.likeCount
+    });
+  } catch (err) {
+    console.error("Like Error:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+  
 }
-
-
-
-
 
 module.exports = {
     handleBlogPost,

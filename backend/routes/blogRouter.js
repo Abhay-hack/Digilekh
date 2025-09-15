@@ -37,7 +37,6 @@ router.patch('/blog/:blogId/comment/:commentId', handleUpdateComment);
 
 router.delete('/blog/comment/:commentId', handleDeleteComment);
 
-router.post('/blog/:blogId/like', handleLikeBlog);
-
+router.post('/blog/:blogId/like',authenticate, handleLikeBlog);
 
 module.exports = router;
