@@ -19,7 +19,7 @@ async function handleCreateCommunity(req, res) {
         const community = new Community({
             name,
             description,
-            creator: req.userid,
+            creator: req.user.userId,
         });
         console.log('Creating community with:', { name, description, creator: req.user.userId });
 
