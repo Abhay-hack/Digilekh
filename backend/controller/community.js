@@ -72,34 +72,40 @@ async function handleIndividualCommunity(req, res) {
 }
 
 async function handleDeleteCommunity(req, res) {
-    try {
-        const { communityId } = req.params;
+  try {
+    const { communityId } = req.params;
 
-        const community = await Community.findById(communityId);
-        if (!community) {
-            return res.status(404).json({ error: 'Community not found' });
-        }
-
-        // Check if the logged-in user is the creator
-        if (community.creator.toString() !== req.user.userId) {
-            return res.status(403).json({ error: 'You are not authorized to delete this community' });
-        }
-
-        await community.remove();
-
-        // Emit the "communityDeleted" event
-        const io = getIo();
-        io.emit('communityDeleted', {
-            communityId,
-            deletedBy: req.user.username || 'Unknown',
-        });
-
-        res.status(200).json({ message: 'Community deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting community:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+    const community = await Community.findById(communityId);
+    if (!community) {
+      return res.status(404).json({ error: "Community not found" });
     }
+
+    // Check ownership (convert both to string)
+    if (community.creator.toString() !== req.user.userId.toString()) {
+      return res
+        .status(403)
+        .json({ error: "You are not authorized to delete this community" });
+    }
+
+    // Use deleteOne instead of remove
+    await Community.deleteOne({ _id: communityId });
+
+    // Emit event
+    const io = getIo();
+    if (io) {
+      io.emit("communityDeleted", {
+        communityId,
+        deletedBy: req.user.username || "Unknown",
+      });
+    }
+
+    res.status(200).json({ message: "Community deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting community:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 }
+
 
 module.exports = {
     handleCreateCommunity,
