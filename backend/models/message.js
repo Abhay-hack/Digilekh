@@ -1,10 +1,9 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema({
   communityId: { type: mongoose.Schema.Types.ObjectId, ref: "Community", required: true },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  message: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-});
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // ✅ reference User
+  text: { type: String, required: true },
+}, { timestamps: true });
 
-module.exports = mongoose.model("Message", messageSchema);
+export default mongoose.model("Message", messageSchema);

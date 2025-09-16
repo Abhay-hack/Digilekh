@@ -101,7 +101,7 @@ const CommunityDetail = () => {
             {messages.map((msg, index) => (
               <div key={index} className="bg-blue-100 p-3 rounded-lg shadow-sm max-w-[80%]">
                 <p className="text-gray-800">
-                  <strong>Anonymous:</strong> {msg.message}
+                  <strong>{msg.user || "Anonymous"}:</strong>
                 </p>
               </div>
             ))}
