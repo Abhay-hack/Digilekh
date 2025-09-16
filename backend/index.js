@@ -84,27 +84,21 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendMessage", async (data) => {
-  try {
     const newMessage = new Message({
       communityId: data.communityId,
-      user: data.userId,   // <-- must be the MongoDB user _id
+      user: data.userId, // pass userId from frontend when sending
       text: data.message,
     });
     await newMessage.save();
 
-    // ✅ Populate user info (fullname only)
     const populated = await newMessage.populate("user", "fullname");
 
     io.to(data.communityId).emit("receiveMessage", {
-      text: populated.text,
-      user: populated.user.fullname,  // send fullname instead of just ID
-      createdAt: populated.createdAt,
+      text: newMessage.text,
+      user: data.userId,
+      createdAt: newMessage.createdAt,
     });
-    } catch (err) {
-        console.error("Error sending message:", err);
-    }
   });
-
 
   socket.on("leaveRoom", (communityId) => {
     socket.leave(communityId);
