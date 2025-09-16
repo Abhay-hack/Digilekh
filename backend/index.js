@@ -70,32 +70,43 @@ app.use('/user', staticRoute);         // Static routes for user handling
 app.use('/api', blogRoute);            // Blog API routes
 
 // Socket.io Connection Event Handlers
-io.on('connection', (socket) => {
-    console.log('A user connected');
+const Message = require("./models/message");
 
-    socket.on('disconnect', () => {
-        console.log('A user disconnected');
-    });
+io.on("connection", (socket) => {
+  console.log("A user connected");
 
-    socket.on('sendMessage', (data) => {
-        io.to(data.communityId).emit('receiveMessage', {
-            message: data.message,
-            user: 'Unknown', // Placeholder for user info
-        });
-    });
+  socket.on("joinRoom", async (communityId) => {
+    socket.join(communityId);
 
-    socket.on('communityCreated', (data) => {
-        console.log('New community created:', data);
-    });
+    // Send past messages
+    const pastMessages = await Message.find({ communityId }).populate("user", "fullname");
+    socket.emit("receiveMessage", pastMessages);
+  });
 
-    socket.on('joinRoom', (communityId) => {
-        socket.join(communityId);
+  socket.on("sendMessage", async (data) => {
+    const newMessage = new Message({
+      communityId: data.communityId,
+      user: data.userId, // pass userId from frontend when sending
+      message: data.message,
     });
+    await newMessage.save();
 
-    socket.on('leaveRoom', (communityId) => {
-        socket.leave(communityId);
+    io.to(data.communityId).emit("receiveMessage", {
+      message: newMessage.message,
+      user: data.userId,
+      createdAt: newMessage.createdAt,
     });
+  });
+
+  socket.on("leaveRoom", (communityId) => {
+    socket.leave(communityId);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
+  });
 });
+
 
 // Start the Server
 server.listen(PORT, () => {

@@ -14,11 +14,17 @@ const userInstance = axios.create({
 
 const communityInstance = axios.create({
   baseURL: `${BASE_URL}/community`,
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem('authToken')}`, // adjust key as needed
-    'Content-Type': 'application/json',
-  },
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
 });
 
+// Add interceptor to always attach latest token
+communityInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export { apiInstance, userInstance, communityInstance };

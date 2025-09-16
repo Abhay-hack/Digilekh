@@ -57,7 +57,11 @@ const CommunityDetail = () => {
     socket.emit('joinRoom', communityId);
 
     socket.on('receiveMessage', (newMessage) => {
-      setMessages(prevMessages => [...prevMessages, newMessage]);
+      if (Array.isArray(newMessage)) {
+        setMessages(newMessage);
+      } else {
+        setMessages((prev) => [...prev, newMessage]);
+      }
     });
 
     socket.on('error', (err) => {
@@ -66,6 +70,7 @@ const CommunityDetail = () => {
 
     return () => {
       socket.emit('leaveRoom', communityId);
+      socket.off("receiveMessage");
     };
   }, [communityId]);
 
